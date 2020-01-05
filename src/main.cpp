@@ -1,7 +1,8 @@
 /*
-    This sketch sends a string to a TCP server, and prints a one-line response.
-    You must run a TCP server in your local network.
-    For example, on Linux you can use this command: nc -v -l 3000
+    main.cpp
+    esp8266_water_tank_monitor
+
+    Copyright (c) 2020 Jeremy Fox All Rights Reserved.
 */
 
 #include <ESP8266WiFi.h>
@@ -53,30 +54,21 @@ void loop() {
     Serial.println(client.remoteIP());
     Serial.print("  PORT: ");
     Serial.println(client.remotePort());
-    while (true){
-      // find how full the tank is:
-      sensor = pulseIn(pwmPin, HIGH);
-      mm = sensor - 300;  // the ultrasonic rangefinder cannot read any distance under 300mm
 
-      percentOfTankFull = (tankDepth - mm) / tankDepth;
-      Serial.print("Distance read: ");
-      Serial.println(mm);
-      Serial.print("Water tank currently holding: ");
-      Serial.println(percentOfTankFull);
+    // find how full the tank is:
+    sensor = pulseIn(pwmPin, HIGH);
+    mm = sensor - 300;  // the ultrasonic rangefinder cannot read any distance under 300mm
 
-      client.print("Tank at : ");
-      client.println(percentOfTankFull);
-      client.print("Distance measured: ");
-      client.println(mm);
+    percentOfTankFull = (tankDepth - mm) / tankDepth;
+    Serial.print("Distance read: ");
+    Serial.println(mm);
+    Serial.print("Water tank currently holding: ");
+    Serial.println(percentOfTankFull);
 
-      delay(750);
-    }
-  }
+    client.println(percentOfTankFull);
 
-  if (flag == 1){
     Serial.println("quitting client.");
     client.stopAll();
-    flag = 0;
-  }
 
+  }
 }
