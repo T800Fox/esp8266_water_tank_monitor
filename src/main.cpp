@@ -6,15 +6,16 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
-#include <creds.h>
+#include <kenmoreCreds.h>
 
 const char* ssid     = STASSID;
 const char* password = STAPWD;
 const int pwmPin = 2; // signal pin from the HXRL Max sonar
-const float tankDepth = 3000; // depth of water tank in mm
+const float tankDepth = 2200; // depth of water tank in mm
 
-float mm;
+float mm, sensor;
 float percentOfTankFull; // expresses how full the tank is i decimel form
+int flag = 0;
 
 ESP8266WiFiMulti WiFiMulti;
 WiFiServer server(3000);
@@ -23,7 +24,6 @@ WiFiClient client;
 void setup() {
   // misc setup:
   Serial.begin(115200);
-  pinMode(pwmPin, OUTPUT);
 
 
   // WiFi setup:
@@ -53,22 +53,30 @@ void loop() {
     Serial.println(client.remoteIP());
     Serial.print("  PORT: ");
     Serial.println(client.remotePort());
+    while (true){
+      // find how full the tank is:
+      sensor = pulseIn(pwmPin, HIGH);
+      mm = sensor - 300;  // the ultrasonic rangefinder cannot read any distance under 300mm
 
-    // find how full the tank is:
-    mm = 1800; // pulseIn(pwmPin, HIGH);
-    mm = mm - 300;  // the ultrasonic rangefinder cannot read any distance under 300mm
-    percentOfTankFull = mm / tankDepth;
-    Serial.print(mm);
-    Serial.print(" / ");
-    Serial.print(tankDepth);
-    Serial.print(" = ");
-    Serial.println(mm / tankDepth);
-    Serial.print("Water tank currently holding: ");
-    Serial.println(percentOfTankFull);
+      percentOfTankFull = (tankDepth - mm) / tankDepth;
+      Serial.print("Distance read: ");
+      Serial.println(mm);
+      Serial.print("Water tank currently holding: ");
+      Serial.println(percentOfTankFull);
 
-    client.println(percentOfTankFull);
+      client.print("Tank at : ");
+      client.println(percentOfTankFull);
+      client.print("Distance measured: ");
+      client.println(mm);
+
+      delay(750);
+    }
   }
-  client.stop();
-  Serial.println("Client disconnected.\n");
+
+  if (flag == 1){
+    Serial.println("quitting client.");
+    client.stopAll();
+    flag = 0;
+  }
 
 }
