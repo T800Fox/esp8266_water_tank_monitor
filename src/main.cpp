@@ -12,7 +12,7 @@
 const char* ssid     = STASSID;
 const char* password = STAPWD;
 const int pwmPin = 2; // signal pin from the HXRL Max sonar
-const float tankDepth = 2200; // depth of water tank in mm
+const float tankDepth = 1920; // depth of water tank in mm
 
 float mm, sensor;
 float percentOfTankFull; // expresses how full the tank is i decimel form
@@ -57,7 +57,7 @@ void loop() {
 
     // find how full the tank is:
     sensor = pulseIn(pwmPin, HIGH);
-    mm = sensor - 300;  // the ultrasonic rangefinder cannot read any distance under 300mm
+    mm = sensor - 516;  // the ultrasonic rangefinder cannot read any distance under 300mm
 
     percentOfTankFull = (tankDepth - mm) / tankDepth;
     Serial.print("Distance read: ");
