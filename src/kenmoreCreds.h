@@ -1,2 +1,2 @@
-#define STASSID "TelstraCD5402"
-#define STAPWD "rwha84hxmb"
+#define STASSID "nice try"
+#define STAPWD "???"
